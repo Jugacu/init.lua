@@ -47,7 +47,7 @@ Plug ('VonHeikemen/lsp-zero.nvim', {['branch']= 'v3.x'})
 
 -- Misc
 Plug('tpope/vim-fugitive')
-Plug('mhinz/vim-signify')
+Plug('airblade/vim-gitgutter')
 Plug('mbbill/undotree')
 
 Plug('nvim-treesitter/nvim-treesitter', {['do']= ':TSUpdate'})
