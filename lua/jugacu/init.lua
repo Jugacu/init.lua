@@ -49,6 +49,7 @@ Plug ('VonHeikemen/lsp-zero.nvim', {['branch']= 'v3.x'})
 Plug('tpope/vim-fugitive')
 Plug('airblade/vim-gitgutter')
 Plug('mbbill/undotree')
+Plug('theprimeagen/harpoon')
 
 Plug('nvim-treesitter/nvim-treesitter', {['do']= ':TSUpdate'})
 Plug('nvim-treesitter/nvim-treesitter-context')
