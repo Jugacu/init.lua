@@ -46,9 +46,6 @@ require('mason-lspconfig').setup({
             require('lspconfig').gopls.setup({
                 settings = {
                     gopls = {
-                        env = {
-                            GOPACKAGESDRIVER = './scripts/gopackagesdriver.sh'
-                        },
                         directoryFilters = {
                             "-bazel-bin",
                             "-bazel-out",
