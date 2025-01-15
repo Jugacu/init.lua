@@ -1,5 +1,9 @@
 local null_ls = require("null-ls")
 
+-- Set environment variables for eslint_d
+vim.env.ESLINT_D_IDLE = "10"                      -- Terminate after 10 seconds of inactivity
+vim.env.ESLINT_D_PPID = tostring(vim.fn.getpid()) -- Tie eslint_d to Neovim's lifecycle
+
 -- Helper to conditionally register eslint handlers only if eslint is
 -- config. If eslint is not configured for a project, it just fails.
 local function has_eslint_config(utils)
