@@ -19,7 +19,7 @@ end)
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { "gopls", "lua_ls", "ts_ls" },
+    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html" },
     handlers = {
         function(server_name)
             require('lspconfig')[server_name].setup({})
@@ -35,6 +35,24 @@ require('mason-lspconfig').setup({
                     "typescript.tsx",
                     "vue",
                 },
+            })
+        end,
+        html = function()
+            require('lspconfig').html.setup({
+                settings = {
+                    html = {
+                        format = {
+                            templating = true,
+                            wrapLineLength = 120,
+                            wrapAttributes = 'preserve-aligned',
+                            indentInnerHtml = true,
+                        },
+                        hover = {
+                            documentation = true,
+                            references = true,
+                        },
+                    }
+                }
             })
         end,
         lua_ls = function()
