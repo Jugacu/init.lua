@@ -1,5 +1,6 @@
 require('jugacu.set')
 require('jugacu.remap')
+require('jugacu.autocmd')
 
 local augroup = vim.api.nvim_create_augroup
 local JugacuGroup = augroup('Jugacu', {})
