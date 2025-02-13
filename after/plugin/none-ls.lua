@@ -12,6 +12,7 @@ local function has_eslint_config(utils)
         "frontend", -- `frontend` subdirectory truly this is only used on cheerfy's admin web
     }
     local eslint_files = {
+        "pnpm-workspace.yaml",
         ".eslintrc",
         ".eslintrc.cjs",
         ".eslintrc.js",
