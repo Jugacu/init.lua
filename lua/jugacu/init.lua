@@ -2,29 +2,6 @@ require('jugacu.set')
 require('jugacu.remap')
 require('jugacu.autocmd')
 
-local augroup = vim.api.nvim_create_augroup
-local JugacuGroup = augroup('Jugacu', {})
-
-local autocmd = vim.api.nvim_create_autocmd
-local yank_group = augroup('HighlightYank', {})
-
-autocmd('TextYankPost', {
-    group = yank_group,
-    pattern = '*',
-    callback = function()
-        vim.highlight.on_yank({
-            higroup = 'IncSearch',
-            timeout = 40,
-        })
-    end,
-})
-
-autocmd({ "BufWritePre" }, {
-    group = JugacuGroup,
-    pattern = "*",
-    command = [[%s/\s\+$//e]],
-})
-
 local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
