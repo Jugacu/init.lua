@@ -21,7 +21,7 @@ end)
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html" },
+    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html", "jsonls" },
     handlers = {
         function(server_name)
             require('lspconfig')[server_name].setup({})
