@@ -1,5 +1,6 @@
 -- Telescope config
 
+local telescope = require('telescope')
 local builtin = require('telescope.builtin')
 local previewers = require('telescope.previewers')
 local previewers_utils = require('telescope.previewers.utils')
@@ -20,11 +21,14 @@ local truncate_large_files = function(filepath, bufnr, opts)
     end)
 end
 
-require('telescope').setup {
+telescope.setup {
   defaults = {
     buffer_previewer_maker = truncate_large_files,
   }
 }
+
+-- Load fzf
+telescope.load_extension('fzf')
 
 vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})

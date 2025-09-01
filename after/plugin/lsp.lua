@@ -19,9 +19,11 @@ end)
 
 --- if you want to know more about lsp-zero and mason.nvim
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
-require('mason').setup({})
+require('mason').setup({
+    ensure_installed = { "prettier" }
+})
 require('mason-lspconfig').setup({
-    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html", "jsonls" },
+    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html", "jsonls"},
     handlers = {
         function(server_name)
             require('lspconfig')[server_name].setup({})
@@ -102,5 +104,15 @@ cmp.setup({
         expand = function(args)
             require('luasnip').lsp_expand(args.body)
         end,
+    },
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'luasnip' },
+        { name = 'path' },
+        { name = 'buffer' },
+    }),
+    window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
     },
 })
