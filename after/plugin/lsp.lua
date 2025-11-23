@@ -38,6 +38,7 @@ require('mason-lspconfig').setup({
                     "typescriptreact",
                     "typescript.tsx",
                     "vue",
+                    "clangd",
                 },
                 on_attach = function(client, bufnr)
                     local eslint_active = utils.has_eslint_config(client.config.root_dir)
