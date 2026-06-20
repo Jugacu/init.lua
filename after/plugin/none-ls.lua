@@ -5,6 +5,11 @@ local utils = require("utils")
 vim.env.ESLINT_D_IDLE = "10"                      -- Terminate after 10 seconds of inactivity
 vim.env.ESLINT_D_PPID = tostring(vim.fn.getpid()) -- Tie eslint_d to Neovim's lifecycle
 
+local function is_ruff_applicable(u)
+    local root = u.root or vim.fn.getcwd()
+    return utils.has_ruff_config() and utils.detect_python_version(root) == 3
+end
+
 null_ls.setup({
     sources = {
         require("none-ls.diagnostics.eslint_d").with({ condition = utils.has_eslint_config }), -- requires none-ls-extras.nvim
@@ -12,5 +17,7 @@ null_ls.setup({
         null_ls.builtins.formatting.prettier.with({
             condition = utils.has_prettier_config
         }),
+        require("none-ls.diagnostics.ruff").with({ condition = is_ruff_applicable }),
+        require("none-ls.formatting.ruff_format").with({ condition = is_ruff_applicable }),
     },
 })

@@ -20,10 +20,10 @@ end)
 --- if you want to know more about lsp-zero and mason.nvim
 --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
 require('mason').setup({
-    ensure_installed = { "prettier" }
+    ensure_installed = { "prettier", "ruff" }
 })
 require('mason-lspconfig').setup({
-    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html", "jsonls"},
+    ensure_installed = { "gopls", "lua_ls", "ts_ls", "html", "jsonls", "pyright", "biome" },
     handlers = {
         function(server_name)
             require('lspconfig')[server_name].setup({})
@@ -41,8 +41,40 @@ require('mason-lspconfig').setup({
                     "clangd",
                 },
                 on_attach = function(client, bufnr)
-                    local eslint_active = utils.has_eslint_config(client.config.root_dir)
-                    client.server_capabilities.documentFormattingProvider = not eslint_active
+                    -- Cede formatting to whichever external tool owns the project so we
+                    -- don't double-format: eslint (via none-ls) or Biome (its own LSP).
+                    local fmt_owned_by_other = utils.has_eslint_config(client.config.root_dir)
+                        or utils.has_biome_config(client.config.root_dir)
+                    client.server_capabilities.documentFormattingProvider = not fmt_owned_by_other
+                end,
+            })
+        end,
+        -- Biome's native LSP: diagnostics, formatting, and organize-imports code
+        -- actions, matching `biome check`. It auto-roots on biome.json, so it only
+        -- attaches inside projects that adopt Biome. The `css` filetype lets it
+        -- format/lint CSS Modules through the same client.
+        biome = function()
+            require('lspconfig').biome.setup({
+                filetypes = {
+                    "javascript",
+                    "javascriptreact",
+                    "typescript",
+                    "typescriptreact",
+                    "json",
+                    "jsonc",
+                    "css",
+                },
+                -- Prefer the project-local Biome (pinned in node_modules) over mason's, so
+                -- the editor's lint/format always matches the version the CLI and CI use.
+                -- A mason binary on a different version can reject a newer biome.json schema
+                -- and then silently emit no diagnostics. Falls back to mason/PATH when there
+                -- is no local install.
+                on_new_config = function(new_config, root_dir)
+                    local uv = vim.uv or vim.loop
+                    local local_bin = root_dir .. "/node_modules/.bin/biome"
+                    if uv.fs_stat(local_bin) then
+                        new_config.cmd = { local_bin, "lsp-proxy" }
+                    end
                 end,
             })
         end,
@@ -82,7 +114,26 @@ require('mason-lspconfig').setup({
                     },
                 },
             })
-        end
+        end,
+        pyright = function()
+            local lspconfig_util = require('lspconfig.util')
+            require('lspconfig').pyright.setup({
+                root_dir = lspconfig_util.root_pattern(
+                    'pyrightconfig.json', 'pyproject.toml', 'setup.py', 'setup.cfg',
+                    'requirements.txt', 'Pipfile', '.git'
+                ),
+                on_new_config = function(new_config, root_dir)
+                    local pyver  = utils.detect_python_version(root_dir)
+                    local py_bin = utils.get_project_python(root_dir)
+                    new_config.settings = new_config.settings or {}
+                    new_config.settings.python = new_config.settings.python or {}
+                    new_config.settings.python.pythonVersion = (pyver == 2) and "2.7" or nil
+                    if py_bin then
+                        new_config.settings.python.pythonPath = py_bin
+                    end
+                end,
+            })
+        end,
     }
 })
 

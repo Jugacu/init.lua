@@ -39,6 +39,16 @@ M.has_eslint_config = function()
     })
 end
 
+-- Biome config checker. Biome is a single binary that both lints and formats;
+-- its presence means it (via its LSP) owns formatting for the project. Includes the
+-- `ui` subdir so it resolves from the wirefinder repo root too.
+M.has_biome_config = function()
+    return has_config({ "frontend", "ui" }, {
+        "biome.json",
+        "biome.jsonc",
+    })
+end
+
 -- Prettier config checker (no subdirectories needed)
 M.has_prettier_config = function()
     return has_config(nil, {
@@ -53,6 +63,37 @@ M.has_prettier_config = function()
         "prettier.config.cjs",
         "prettier.config.mjs",
     })
+end
+
+M.get_project_python = function(root_dir)
+    if not root_dir then return nil end
+    for _, venv in ipairs({ ".venv", "venv", "env" }) do
+        local p = root_dir .. "/" .. venv .. "/bin/python"
+        if vim.loop.fs_stat(p) then return p end
+    end
+    return nil
+end
+
+M.detect_python_version = function(root_dir)
+    if not root_dir then return 3 end
+    if #vim.fn.glob(root_dir .. "/{.venv,venv,env}/lib/python2.*", false, true) > 0 then
+        return 2
+    end
+    local pv = root_dir .. "/.python-version"
+    if lspconfig_util.path.exists(pv) then
+        local f = io.open(pv, "r")
+        if f then
+            local line = f:read("*l") or ""
+            f:close()
+            if line:match("^2%.") then return 2 end
+        end
+    end
+    if lspconfig_util.path.exists(root_dir .. "/.py2-project") then return 2 end
+    return 3
+end
+
+M.has_ruff_config = function()
+    return has_config(nil, { "pyproject.toml", "ruff.toml", ".ruff.toml" })
 end
 
 return M
